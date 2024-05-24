@@ -63,7 +63,8 @@ def main():
                          "strides": [1, 1],
                          "pads": [0, 0, 0, 0],
                          "group": num_groups
-                     })
+                     },
+                     domain="trt.plugins")
     node_3 = gs.Node(name="Conv-3",
                      op="Conv",
                      inputs=[X2, W2],
@@ -80,6 +81,7 @@ def main():
                      outputs=[X3],
                      opset=opset_version)
     model = gs.export_onnx(graph)
+    model.opset_import.append(onnx.helper.make_opsetid('trt.plugins', 1))
     # Shape inference does not quite work here because of the custom operator.
     # model = onnx.shape_inference.infer_shapes(model)
     onnx.save(model, onnx_file_path)
