@@ -13,7 +13,7 @@ The ONNX model we created is a simple identity neural network that consists of t
 To build the custom Docker image, please run the following command.
 
 ```bash
-$ docker build -f docker/tensorrt.Dockerfile --no-cache --tag=tensorrt:24.02 .
+$ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=8.6.1.6 --build-arg CUDA_USER_VERSION=11.8 --tag=cuda:11.8-cudnn8-trt8.6.1.6 .
 ```
 
 ### Run Docker Container
@@ -21,7 +21,7 @@ $ docker build -f docker/tensorrt.Dockerfile --no-cache --tag=tensorrt:24.02 .
 To run the custom Docker container, please run the following command.
 
 ```bash
-$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt tensorrt:24.02
+$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt8.6.1.6
 ```
 
 ### Build Application
@@ -29,11 +29,16 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt tensorrt:24.02
 To build the application, please run the following command.
 
 ```bash
-$ cmake -B build
+$ cmake -B build -DNVINFER_LIB=/opt/TensorRT-8.6.1.6/lib/libnvinfer.so -DNVINFER_PLUGIN_LIB=/opt/TensorRT-8.6.1.6/lib/libnvinfer_plugin.so -DNVONNXPARSER_LIB=/opt/TensorRT-8.6.1.6/lib/libnvonnxparser.so -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=/opt/TensorRT-8.6.1.6/include
 $ cmake --build build --config Release --parallel
 ```
 
 Under the `build/src` directory, the custom plugin library will be saved as `libidentity_conv.so`, the engine builder will be saved as `build_engine`, and the engine runner will be saved as `run_engine`.
+
+Test plugin:
+```bash
+$ python python/test_plugin.py
+```
 
 ### Build ONNX Model
 
