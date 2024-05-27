@@ -14,6 +14,8 @@ def main():
     data_directory_path = "data"
     onnx_file_name = "identity_neural_network.onnx"
     onnx_file_path = os.path.join(data_directory_path, onnx_file_name)
+    trt_plugin_domain = "trt.plugins"
+    trt_plugin_version = 1
 
     input_shape = (1, 3, 480, 960)
     input_data = np.random.rand(*input_shape).astype(np.float32)
@@ -64,7 +66,7 @@ def main():
                          "pads": [0, 0, 0, 0],
                          "group": num_groups
                      },
-                     domain="trt.plugins")
+                     domain=trt_plugin_domain)
     node_3 = gs.Node(name="Conv-3",
                      op="Conv",
                      inputs=[X2, W2],
@@ -81,7 +83,7 @@ def main():
                      outputs=[X3],
                      opset=opset_version)
     model = gs.export_onnx(graph)
-    model.opset_import.append(onnx.helper.make_opsetid('trt.plugins', 1))
+    model.opset_import.append(onnx.helper.make_opsetid(trt_plugin_domain, trt_plugin_version))
     # Shape inference does not quite work here because of the custom operator.
     # model = onnx.shape_inference.infer_shapes(model)
     onnx.save(model, onnx_file_path)
