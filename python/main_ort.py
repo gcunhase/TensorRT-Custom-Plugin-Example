@@ -24,53 +24,71 @@ def main():
 
     # Create TensorRT provider options
     assert "TensorrtExecutionProvider" in ort.get_available_providers(), "TensorrtExecutionProvider not available!"
-    tensorrt_options = {
-        "device_id": 0,
-        "trt_extra_plugin_lib_paths": plugin_lib_file_path,
-    }
 
-    EP = [('TensorrtExecutionProvider', tensorrt_options)]
+    EP = [
+        ('TensorrtExecutionProvider', {
+            "device_id": 0,
+            "trt_extra_plugin_lib_paths": plugin_lib_file_path,
+        }),
+        ('CUDAExecutionProvider', {
+            'device_id': 0,
+            'arena_extend_strategy': 'kNextPowerOfTwo',
+            'gpu_mem_limit': 2 * 1024 * 1024 * 1024,
+            'cudnn_conv_algo_search': 'EXHAUSTIVE',
+            'do_copy_in_default_stream': True,
+        }),
+    ]
 
     # import ctypes
     # ctypes.CDLL(self.custom_ops, winmode=0)
     # common_runtime.load_plugin_lib(plugin_lib_file_path)
 
     # Dummy example.
-    # Generate random data
+    # Generate random data and get input / output shapes
     graph = gs.import_onnx(onnx.load(onnx_file_path))
     if len(graph.inputs) == 1:
         input_shape = tuple(graph.inputs[0].shape)
     else:
         input_shape = [inp.shape for inp in graph.inputs]
+    if len(graph.outputs) == 1:
+        output_shape = tuple(graph.outputs[0].shape)
+    else:
+        output_shape = [out.shape for out in graph.outputs]
     data = load_dummy_data(input_shape=input_shape)
 
     # Initiate ORT session
     ort_session = ort.InferenceSession(onnx_file_path, sess_options=session_opts, providers=EP)
     input_names = [inp.name for inp in ort_session.get_inputs()]
-    output_names = [inp.name for inp in ort_session.get_outputs()]
+    output_names = [out.name for out in ort_session.get_outputs()]
 
     # Print input tensor information
-    print("Input Tensor:")
+    print("Input Tensors:")
     print(" - Names: {}".format(input_names))
     print(" - Shapes: {}".format(input_shape))
 
     # Execute ORT
+    inputs = []
     outputs = []
+    print("Inference: ")
     for i, images in enumerate(data):
-        print(f"Batch {i + 1}")
+        print(f"  Batch {i + 1}")
+        inputs.append([images])
         inp = dict(zip(input_names, images if len(input_names) > 1 else [images]))
         output = ort_session.run([], inp)
         outputs.append(output)
 
     # Print output tensor data.
-    print("Outputs Tensor:")
+    print("Output Tensors:")
     print(" - Names: {}".format(output_names))
+    print(" - Shapes: {}".format(output_shape))
 
-    # # In our case, the input and output tensor data should be exactly the same.
-    # for input_host_device_buffer, output_host_device_buffer in zip(
-    #         inputs, outputs):
-    #     np.testing.assert_equal(input_host_device_buffer.host,
-    #                             output_host_device_buffer.host)
+    # In our case, the input and output tensor data should be exactly the same.
+    try:
+        for inp, out in zip(inputs, outputs):
+            np.testing.assert_equal(inp, out)
+        print("PASS: All inputs / outputs match!")
+    except AssertionError:
+        print("FAIL: At least some inputs / outputs don't match!")
 
 
 if __name__ == "__main__":
