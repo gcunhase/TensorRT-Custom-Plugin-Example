@@ -13,15 +13,17 @@ The ONNX model we created is a simple identity neural network that consists of t
 To build the custom Docker image, please run the following command.
 
 ```bash
-$ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=8.6.1.6 --build-arg CUDA_USER_VERSION=11.8 --tag=cuda:11.8-cudnn8-trt8.6.1.6 .
+$ export TRT_VERSION=8.6.1.6
+$ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=$TRT_VERSION --build-arg CUDA_USER_VERSION=11.8 --tag=cuda:11.8-cudnn8-trt$TRT_VERSION .
 ```
+> The TensorRT .tar should be available in `./downloads/`. 
 
 ### Run Docker Container
 
 To run the custom Docker container, please run the following command.
 
 ```bash
-$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt8.6.1.6
+$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt$TRT_VERSION
 ```
 
 ### Build Application
@@ -29,7 +31,7 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt8.6.1.6
 To build the application, please run the following command.
 
 ```bash
-$ cmake -B build -DNVINFER_LIB=/opt/TensorRT-8.6.1.6/lib/libnvinfer.so -DNVINFER_PLUGIN_LIB=/opt/TensorRT-8.6.1.6/lib/libnvinfer_plugin.so -DNVONNXPARSER_LIB=/opt/TensorRT-8.6.1.6/lib/libnvonnxparser.so -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=/opt/TensorRT-8.6.1.6/include
+$ cmake -B build -DNVINFER_LIB=$TRT_PATH/lib/libnvinfer.so -DNVINFER_PLUGIN_LIB=$TRT_PATH/lib/libnvinfer_plugin.so -DNVONNXPARSER_LIB=$TRT_PATH/lib/libnvonnxparser.so -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$TRT_PATH/include
 $ cmake --build build --config Release --parallel
 ```
 
