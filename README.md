@@ -13,7 +13,7 @@ The ONNX model we created is a simple identity neural network that consists of t
 To build the custom Docker image, please run the following command.
 
 ```bash
-$ export TRT_VERSION=8.6.1.6
+$ export TRT_VERSION=10.0.1.6
 $ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=$TRT_VERSION --build-arg CUDA_USER_VERSION=11.8 --tag=cuda:11.8-cudnn8-trt$TRT_VERSION .
 ```
 > The TensorRT .tar should be available in `./downloads/`. 
@@ -36,6 +36,8 @@ $ cmake --build build --config Release --parallel
 ```
 
 Under the `build/src` directory, the custom plugin library will be saved as `libidentity_conv.so`, the engine builder will be saved as `build_engine`, and the engine runner will be saved as `run_engine`.
+
+**TODO**: Add support for the next steps for TRT 10. Need to [migrate V2 Plugin to V3](https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html#migrating-plugins).
 
 Test plugin:
 ```bash

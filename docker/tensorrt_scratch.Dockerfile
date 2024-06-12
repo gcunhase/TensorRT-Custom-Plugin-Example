@@ -79,7 +79,11 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install cuda-python==11.8.0 \
                 numpy \
                 onnx==1.15.0 \
-                onnxruntime-gpu==1.17.0 \
                 onnx-graphsurgeon \
                 psutil
+RUN if [ "$TENSORRT_VERSION" = "8.6.1.6" ]; then \
+      pip install onnxruntime-gpu==1.17.0; \
+    else \
+      pip install onnxruntime-gpu==1.18.0; \
+    fi
 RUN pip install torch --index-url https://download.pytorch.org/whl/cu118
