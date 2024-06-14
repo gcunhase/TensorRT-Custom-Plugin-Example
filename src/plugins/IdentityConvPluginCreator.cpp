@@ -60,8 +60,8 @@ IdentityConvCreator::getFieldNames() noexcept
     return &mFC;
 }
 
-nvinfer1::IPluginV2IOExt* IdentityConvCreator::createPlugin(
-    char const* name, nvinfer1::PluginFieldCollection const* fc) noexcept
+nvinfer1::IPluginV3* IdentityConvCreator::createPlugin(
+    char const* name, nvinfer1::PluginFieldCollection const* fc, TensorRTPhase phase) noexcept
 {
     // The attributes from the ONNX node will be parsed and passed via fc.
     try
@@ -154,26 +154,9 @@ nvinfer1::IPluginV2IOExt* IdentityConvCreator::createPlugin(
         ss << "group: " << group;
         logInfo(ss.str().c_str());
 
-        IdentityConvParameters const params{.group = group};
+        IdentityConvParameters const params{.kernelShape = kernelShape, .strides = strides, .pads = pads, .group = group};
 
         IdentityConv* const plugin{new IdentityConv{params}};
-        plugin->setPluginNamespace(mNamespace.c_str());
-        return plugin;
-    }
-    catch (std::exception const& e)
-    {
-        caughtError(e);
-    }
-    return nullptr;
-}
-
-nvinfer1::IPluginV2IOExt*
-IdentityConvCreator::deserializePlugin(char const* name, void const* serialData,
-                                       size_t serialLength) noexcept
-{
-    try
-    {
-        IdentityConv* plugin = new IdentityConv{serialData, serialLength};
         plugin->setPluginNamespace(mNamespace.c_str());
         return plugin;
     }

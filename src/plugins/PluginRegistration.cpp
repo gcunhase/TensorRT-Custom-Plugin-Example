@@ -51,12 +51,12 @@ extern "C" void setLoggerFinder(nvinfer1::ILoggerFinder* finder)
     gLoggerFinder.setLoggerFinder(finder);
 }
 
-extern "C" nvinfer1::IPluginCreator* const*
+extern "C" nvinfer1::IPluginCreatorV3One* const*
 getPluginCreators(int32_t& nbCreators)
 {
     nbCreators = 1;
     static nvinfer1::plugin::IdentityConvCreator identityConvCreator{};
-    static nvinfer1::IPluginCreator* const pluginCreatorList[] = {
+    static nvinfer1::IPluginCreatorV3One* const pluginCreatorList[] = {
         &identityConvCreator};
     return pluginCreatorList;
 }

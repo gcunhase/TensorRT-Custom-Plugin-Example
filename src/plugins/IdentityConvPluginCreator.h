@@ -11,15 +11,15 @@ namespace nvinfer1
 namespace plugin
 {
 
-class BaseCreator : public nvinfer1::IPluginCreator
+class BaseCreator : public nvinfer1::IPluginCreatorV3One
 {
 public:
-    void setPluginNamespace(char const* libNamespace) noexcept override
+    void setPluginNamespace(char const* libNamespace) noexcept
     {
         mNamespace = libNamespace;
     }
 
-    char const* getPluginNamespace() const noexcept override
+    char const* getPluginNamespace() const noexcept
     {
         return mNamespace.c_str();
     }
@@ -36,19 +36,14 @@ public:
 
     ~IdentityConvCreator() override = default;
 
-    char const* getPluginName() const noexcept override;
+    char const* getPluginName() const noexcept;
 
-    char const* getPluginVersion() const noexcept override;
+    char const* getPluginVersion() const noexcept;
 
     nvinfer1::PluginFieldCollection const* getFieldNames() noexcept override;
 
-    nvinfer1::IPluginV2IOExt*
-    createPlugin(char const* name,
-                 nvinfer1::PluginFieldCollection const* fc) noexcept override;
-
-    nvinfer1::IPluginV2IOExt*
-    deserializePlugin(char const* name, void const* serialData,
-                      size_t serialLength) noexcept override;
+    nvinfer1::IPluginV3* createPlugin(char const* name, nvinfer1::PluginFieldCollection const* fc,
+        TensorRTPhase phase) noexcept override;
 
 private:
     nvinfer1::PluginFieldCollection mFC;
