@@ -11,14 +11,6 @@ $ python -m unittest test_plugin
 $ python -m unittest test_engine
 ```
 
-## To run ONNX via ORT
-
-To run inference in the ONNX file via ORT, please run the following command.
-
-```bash
-$ python main_ort.py
-```
-
 ## Run TensorRT Engine
 
 To run the TensorRT engine, please run the following command.
@@ -34,3 +26,12 @@ $ python main.py --engine_file_path ../data/identity_neural_network_iplugin_v2_i
 ```bash
 $ python main.py --engine_file_path ../data/identity_neural_network_iplugin_v3.engine --plugin_lib_file_path ../build/src/plugins/IdentityConvIPluginV3/libidentity_conv_iplugin_v3.so
 ```
+
+## Run ONNX via ORT
+
+To run inference in the ONNX file via ONNX-Runtime (ORT), please run the following command.
+
+```bash
+$ python main_ort.py
+```
+> **Note**: this script only supports TRT 10 and ORT 1.18.
