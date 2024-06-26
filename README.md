@@ -13,17 +13,24 @@ The ONNX model we created is a simple identity neural network that consists of t
 To build the custom Docker image, please run the following command.
 
 ```bash
-$ export TRT_VERSION=8.6.1.6
-$ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=$TRT_VERSION --build-arg CUDA_USER_VERSION=11.8 --tag=cuda:11.8-cudnn8-trt$TRT_VERSION .
+# (Option 1) TRT 10, CUDA 12, ORT 11.8
+$ export TAG=tensorrt:24.05
+$ $ docker build -f docker/tensorrt.Dockerfile --no-cache --tag=$TAG .
+
+# (Option 2) Custom TRT, CUDA 11.8, ORT 11.8
+$ export TRT_VERSION=10.0.1.6
+$ export TAG=cuda:11.8-cudnn8-trt$TRT_VERSION
+$ docker build -f docker/tensorrt_scratch.Dockerfile --no-cache --build-arg TENSORRT_VERSION=$TRT_VERSION --build-arg CUDA_USER_VERSION=11.8 --tag=$TAG .
 ```
-> The TensorRT .tar should be available in `./downloads/`. 
+> The TensorRT .tar should be available in `./downloads/` for 'Option 2'.
 
 ### Run Docker Container
 
 To run the custom Docker container, please run the following command.
 
 ```bash
-$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt$TRT_VERSION
+$ docker run -it --rm --gpus device=0 -v $(pwd):/mnt $TAG
+$ cd /mnt
 ```
 
 ### Build Application
@@ -31,6 +38,11 @@ $ docker run -it --rm --gpus device=0 -v $(pwd):/mnt cuda:11.8-cudnn8-trt$TRT_VE
 To build the application, please run the following command.
 
 ```bash
+# (Option 1) TRT 10, CUDA 12, ORT 11.8
+$ cmake -B build
+$ cmake --build build --config Release --parallel
+
+# (Option 2) Custom TRT, CUDA 11.8, ORT 11.8
 $ cmake -B build -DNVINFER_LIB=$TRT_PATH/lib/libnvinfer.so -DNVINFER_PLUGIN_LIB=$TRT_PATH/lib/libnvinfer_plugin.so -DNVONNXPARSER_LIB=$TRT_PATH/lib/libnvonnxparser.so -DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=$TRT_PATH/include
 $ cmake --build build --config Release --parallel
 ```
@@ -41,7 +53,7 @@ Under the `build/src/apps` directory, the engine builder will be saved as `build
 
 Test plugin:
 ```bash
-$ python python/test_plugin.py
+$ cd python && python test_plugin.py
 ```
 
 ### Build ONNX Model

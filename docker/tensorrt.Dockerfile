@@ -36,5 +36,8 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install cuda-python==12.3.0 \
                 numpy==1.26.3 \
                 onnx==1.15.0
+RUN pip install onnxruntime-gpu --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple/
 RUN pip install --extra-index-url https://pypi.ngc.nvidia.com onnx_graphsurgeon==0.3.27
 RUN pip install torch==2.3.0+cu121 --index-url https://download.pytorch.org/whl/cu121
+
+ENV LD_LIBRARY_PATH=/usr/local/lib/python3.10/dist-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH

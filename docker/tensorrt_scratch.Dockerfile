@@ -57,12 +57,6 @@ ENV TRT_PATH=/opt/TensorRT-${TENSORRT_VERSION}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${TRT_PATH}/lib:${TRT_PATH}/include
 ENV PATH=$PATH:${TRT_PATH}/bin
 
-# System locale
-# Important for UTF-8
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-
 # Install CMake
 RUN cd /tmp && \
     wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh && \
@@ -71,7 +65,7 @@ RUN rm -rf /tmp/*
 
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install cuda-python==11.8.0 \
-                numpy<2 \
+                numpy==1.26.3 \
                 onnx==1.15.0 \
                 onnx-graphsurgeon \
                 psutil
@@ -79,5 +73,5 @@ RUN if [ "$TENSORRT_VERSION" = "8.6.1.6" ]; then \
       pip install onnxruntime-gpu==1.17.0; \
     else \
       pip install onnxruntime-gpu==1.18.0; \
-    fi \
+    fi
 RUN pip install torch --index-url https://download.pytorch.org/whl/cu118
