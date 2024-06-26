@@ -17,7 +17,7 @@ def load_dummy_data(input_shape, data_size=5):
 def main():
 
     onnx_file_path = "../data/identity_neural_network.onnx"
-    plugin_lib_file_path = "../build/src/libidentity_conv.so"
+    plugin_lib_file_path = "../build/src/plugins/IdentityConvIPluginV2IOExt/libidentity_conv_iplugin_v2_io_ext.so"
 
     session_opts = ort.SessionOptions()
     session_opts.log_severity_level = 1
@@ -38,10 +38,6 @@ def main():
             'do_copy_in_default_stream': True,
         }),
     ]
-
-    # import ctypes
-    # ctypes.CDLL(self.custom_ops, winmode=0)
-    # common_runtime.load_plugin_lib(plugin_lib_file_path)
 
     # Dummy example.
     # Generate random data and get input / output shapes
