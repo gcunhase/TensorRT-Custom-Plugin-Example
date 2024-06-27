@@ -15,7 +15,7 @@ To build the custom Docker image, please run the following command.
 ```bash
 # (Option 1) TRT 10, CUDA 12, ORT 11.8
 $ export TAG=tensorrt:24.05
-$ $ docker build -f docker/tensorrt.Dockerfile --no-cache --tag=$TAG .
+$ docker build -f docker/tensorrt.Dockerfile --no-cache --tag=$TAG .
 
 # (Option 2) Custom TRT, CUDA 11.8, ORT 11.8
 $ export TRT_VERSION=10.0.1.6
